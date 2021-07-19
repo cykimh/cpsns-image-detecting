@@ -35,6 +35,22 @@ def main(arguments):
 	# 3. 페이스북 페이지 좋아요
 	# 4. 네이버 언론사 구독
 	# 5. 카카오 플친추가
+
+    #- Youtube (영상 좋아요 + 채널 구독)
+    # : 좋아요
+    # : 참여검증텍스트
+    #- facebook (페이지 좋아요)
+    # : 좋아요
+    # : 참여검증텍스트
+    #- insta(=instagram) (페이지 팔로우)
+    # : 참여검증텍스트 
+    #- kakao (카톡 플친 추가)
+    # : 참여검즏텍스트
+    #- media(=naver) (네이버 언론사 구독)
+    # : 참여검증텍스트 
+    #- shoppinglive(=shopping) (쇼핑 라이브 방송 알림 설정)
+    # : 참여검증텍스트
+
 	result = {}
 	if sns_type == 'youtube':
 		print('Youtube')
@@ -57,17 +73,20 @@ def main(arguments):
 
 
 # 템플릿매칭 함수
-def template_matching(large_img_path, small_img_path, new_width=720):
-	# 검색할 기준 이미지 읽기
-	large_img = cv2.imread(large_img_path, 0)
-	large_img_width, large_img_height = large_img.shape[::-1]
+def template_matching(large_img_path, small_img_path, resize_width):
+    	
+	# 첨부파일 이미지 읽기 - flag(-1: IMREAD_COLOR 0: IMREAD_GRAYSCALE 1: IMREAD_UNCHANGED)
+	large_img = cv2.imread(large_img_path, cv2.IMREAD_GRAYSCALE)
 
-	new_height = int(new_width * large_img_height / large_img_width)
+	large_img_width, large_img_height = large_img.shape[::-1] # (크기, 정밀도, 채널) 값을 반환
+	# print(large_img, large_img.shape, large_img_path, small_img_path)
 
-	# print("## 큰이미지 높이,너비 리사이즈", large_img_width, large_img_height, " => ", new_width, new_height)
+	# 첨부 이미지파일 검색을 위한 리사이즈
+	new_height = int(resize_width * large_img_height / large_img_width)
 
-	large_img = cv2.resize(large_img, (new_width, new_height), interpolation=cv2.INTER_AREA)
-	# 읽어와서 복사??
+	# print("## 큰이미지 높이,너비 리사이즈", large_img_width, large_img_height, " => ", resize_width, new_height)
+
+	large_img = cv2.resize(large_img, (resize_width, new_height), interpolation=cv2.INTER_AREA)
 	large_img_copy = large_img.copy()
 
 	# 큰이미지 내에 찾을 템플릿이미지 읽기
@@ -103,7 +122,7 @@ def template_matching(large_img_path, small_img_path, new_width=720):
 		cv2.rectangle(img, top_left, bottom_right, (255, 0, 0), 3)
 
 		# 찾은 결과 이미지 저장
-		found_image_path = IMAGE_DIR_PATH + '/result/found_image_' + datetime.datetime.now().strftime(
+		found_image_path = IMAGE_DIR_PATH + 'result/found_image_' + datetime.datetime.now().strftime(
 			"%Y%m%d%H%M%S") + '.png'
 		cv2.imwrite(found_image_path, img)
 
@@ -160,14 +179,16 @@ def vision_api_ocr(img_path):
 class Youtube:
 
 	def __init__(self, img_path, text_list):
+		# 첨부된 이미지파일 경로
 		self.capture_img_path = img_path
 		# OCR Option
 		self.text_list = text_list
 
 		# OpenCV Option
-		self.fixed_img_width = 720
+		self.resize_image_width = 720
 		self.similarity_rate = 0.9
-		self.like_btn_img_path = IMAGE_DIR_PATH + '/asset/like_btn_ios_1.png'  # 좋아요 이미지 경로
+		# self.like_btn_img_path = IMAGE_DIR_PATH + 'asset/like_btn_ios_dark.png'  # 좋아요 이미지 경로
+		self.like_btn_img_path = IMAGE_DIR_PATH + 'asset/like_btn_android_light.png'  # 좋아요 이미지 경로
 
 	def detect_text(self):  # Vision API OCR 텍스트 문자 확인
 
@@ -193,7 +214,7 @@ class Youtube:
 		is_detect = False
 
 		# TODO : 테마(다크, 라이트), 모바일웹에 맞게 찾을 템플릿 이미지 바뀌어야함
-		matching_result = template_matching(self.capture_img_path, self.like_btn_img_path, self.fixed_img_width)
+		matching_result = template_matching(self.capture_img_path, self.like_btn_img_path, self.resize_image_width)
 
 		if bool(matching_result['correlation_rate']) and matching_result['correlation_rate'] > self.similarity_rate:
 			is_detect = True
