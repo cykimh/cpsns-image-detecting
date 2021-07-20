@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import cv2
 import sys
@@ -10,7 +12,8 @@ from google.cloud import vision
 
 # google-vision-api 관련 key file path
 KEY_PATH = 'reflected-jet-176504-4b9d781b0f09.json'
-IMAGE_DIR_PATH = 'images/'
+# IMAGE_DIR_PATH = 'images/'
+# SCRIPT_DIR_PATH = ''
 
 
 def main(arguments):
@@ -22,13 +25,20 @@ def main(arguments):
 	parser.add_argument('-i', '--image_path', help="캡처 이미지 파일 경로", required=True)
 	parser.add_argument('-t', '--sns_type', help="CPSNS 타입", required=True)
 	parser.add_argument('-f', '--find_text', help="찾을 텍스트", nargs='+')
-	parser.add_argument('-e', '--env', required=False, default='dev', help="개발환경은 뭔가")
+	parser.add_argument('-e', '--env', default='dev', help="개발환경은 뭔가", required=False)
+	parser.add_argument('-p', '--script_dir_path', default='', help="스크립트 디렉토리 경로", required=False)
+	parser.add_argument('-q', '--image_dir_path', default='images/', help="이미지 디렉토리 경로", required=False)
 
 	args = parser.parse_args(arguments)
 
 	sns_type = args.sns_type
 	image_path = args.image_path
 	find_text = args.find_text
+
+	global IMAGE_DIR_PATH
+	IMAGE_DIR_PATH = args.image_dir_path
+	global SCRIPT_DIR_PATH
+	SCRIPT_DIR_PATH = args.script_dir_path
 
 	# 1. 유튜브 영상 좋아요 + 구독
 	# 2. 인스타 페이지 좋아요
@@ -122,7 +132,7 @@ def template_matching(large_img_path, small_img_path, resize_width):
 		cv2.rectangle(img, top_left, bottom_right, (255, 0, 0), 3)
 
 		# 찾은 결과 이미지 저장
-		found_image_path = IMAGE_DIR_PATH + 'result/found_image_' + datetime.datetime.now().strftime(
+		found_image_path = IMAGE_DIR_PATH + '/result/found_image_' + datetime.datetime.now().strftime(
 			"%Y%m%d%H%M%S") + '.png'
 		cv2.imwrite(found_image_path, img)
 
@@ -188,7 +198,7 @@ class Youtube:
 		self.resize_image_width = 720
 		self.similarity_rate = 0.9
 		# self.like_btn_img_path = IMAGE_DIR_PATH + 'asset/like_btn_ios_dark.png'  # 좋아요 이미지 경로
-		self.like_btn_img_path = IMAGE_DIR_PATH + 'asset/like_btn_android_light.png'  # 좋아요 이미지 경로
+		self.like_btn_img_path = IMAGE_DIR_PATH + '/assets/like_btn_android_light.png'  # 좋아요 이미지 경로
 
 	def detect_text(self):  # Vision API OCR 텍스트 문자 확인
 
