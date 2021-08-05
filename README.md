@@ -52,3 +52,12 @@ $ sudo pip3 install opencv-python==4.5.3.56
 [Google-Vision-API](https://googleapis.dev/python/vision/latest/index.html)
 
 [OpenCV-Python](https://pypi.org/project/opencv-python/)
+
+
+$ python main.py -t youtube -i dataset/youtube/G6/Screenshot_20210716-100941.png
+$ python main.py -t youtube -i dataset/youtube/S4_LTE-A/Screenshot_2021-07-16-11-47-50.png
+
+$ python main.py -t shoppinglive -i dataset/shoppinglive/shoppinglive_sample1.jpg
+$ python main.py -t shoppinglive -i dataset/shoppinglive/shoppinglive_sample2.png
+$ python main.py -t shoppinglive -i dataset/shoppinglive/shoppinglive_sample3.png
+
